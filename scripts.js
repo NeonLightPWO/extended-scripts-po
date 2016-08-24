@@ -1,7 +1,7 @@
 // These scripts will only work on 2.0.00 or newer.
 // You may change these variables as long as you keep the same type
 var Config = {
-    base_url: "https://raw.githubusercontent.com/Rainzye/extended-scripts-po/master/",
+    base_url: "https://raw.githubusercontent.com/Rainzye/extended-scripts-po/master/scripts.js",
     dataDir: "scriptdata/",
     bot: "Dratini",
     kickbot: "Blaziken",
