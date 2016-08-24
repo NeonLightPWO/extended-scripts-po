@@ -1,0 +1,26 @@
+silph. corp.*scriptdata/channeldata/14714628952844445289478171617.json
+mafia*scriptdata/channeldata/14714628953295369495181366801.json
+indigo plateau*scriptdata/channeldata/14714628953449483969064895064.json
+victory road*scriptdata/channeldata/14714628953615128431820776314.json
+tournaments*scriptdata/channeldata/14714628953745767966613639146.json
+watch*scriptdata/channeldata/147146289541040881280438043177.json
+trivia*scriptdata/channeldata/14714628954248275717759970576.json
+trivreview*scriptdata/channeldata/147146289543944311380898579955.json
+hangman*scriptdata/channeldata/14714628954650488957017660141.json
+blackjack*scriptdata/channeldata/14714628954786199106324929744.json
+safari*scriptdata/channeldata/14714628954922743301000446081.json
+evolution game*scriptdata/channeldata/14714628957015828803908079863.json
+developer's den*scriptdata/channeldata/147146289594731762095843441784.json
+pallet town*scriptdata/channeldata/147146321518409084963100031018.json
+cinnabar island*scriptdata/channeldata/1471463657502301465617492795.json
+mewtwo's cave*scriptdata/channeldata/14714637393655497160905506462.json
+old power plant*scriptdata/channeldata/147146519056032327932957559824.json
+dragon's lair*scriptdata/channeldata/14714653571027859853259287775.json
+stark mountain*scriptdata/channeldata/147146612322746126812417060137.json
+radio tower*scriptdata/channeldata/14714662300868226933013647795.json
+mount silver*scriptdata/channeldata/14714663403417123796783853322.json
+route 202*scriptdata/channeldata/14714671392799751743387896568.json
+channel*scriptdata/channeldata/14714679241527330254749394953.json
+icy cave*scriptdata/channeldata/147146842800522329364926554263.json
+test123*scriptdata/channeldata/147146857144307269235420972109.json
+main channel*scriptdata/channeldata/14715475624879618499036878347.json
