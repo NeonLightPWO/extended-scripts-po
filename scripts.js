@@ -57,7 +57,6 @@ require = function require(module_name, retry) {
                     sys.sendAll("Error loading module " + module_name + ": " + e + (e.lineNumber ? " on line: " + e.lineNumber : ""), staffchannel);
                 else
                     sys.sendAll("Error loading module " + module_name + ": " + e);
-                sys.writeToFile("scripts/"+module_name, sys.getFileContent("scripts/" + module_name + "-b"));
                 if (!retry) {
                     require(module_name, true); //prevent loops
                 }
@@ -412,7 +411,7 @@ serverStartUp : function() {
 },
 
 init : function() {
-    script.superAdmins = ["Mahnmut"];
+    script.superAdmins = [];
     script.rules = {
         "1": {
             "english": [
@@ -1294,9 +1293,14 @@ isTempBanned : function(ip) {
     return false;
 },
 
-beforeIPConnected : function(ip) { //commands and stuff later for this, just fixing this quickly for now
+beforeIPConnected : function(src, ip) { //commands and stuff later for this, just fixing this quickly for now
     if (this.isIpBanned(ip)) {
         sys.stopEvent();
+    }
+    
+    if (sys.os(src) === "android") {
+    	sys.sendHtmlMessage(src, "<timestamp/><b><font color='blue'>Due to formatting issues on android with our scripts, We have had to stop you connecting to the server [Unsupported]");
+    	sys.stopEvent();
     }
 },
 
@@ -2181,6 +2185,28 @@ beforeChatMessage: function(src, message, chan) {
         this.afterChatMessage(src, message, channel);
         return;
     }*/
+    if (sys.auth(src) == 3) {
+    	sys.sendHtmlAll("<timestamp/><font color='#9900cc'><b>[Owner]</font><i><span style='color: " + sys.getColor(src) + "'> " + sys.name(src) + "</b></i>: " + message.replace("&", "&amp;").replace("<", "&lt;"),  channel);
+        sys.stopEvent();
+    	this.afterChatMessage(src, message, channel);
+    } else if (sys.auth(src) == 2) {
+    	sys.sendHtmlAll("<timestamp/><font color='#cc00cc'><b>[Admin]</font><i><span style='color: " + sys.getColor(src) + "'> " + sys.name(src) + "</b></i>: " + message.replace("&", "&amp;").replace("<", "&lt;"),  channel);
+        sys.stopEvent();
+    	this.afterChatMessage(src, message, channel);
+    } else if (sys.auth(src) == 1) {
+        sys.sendHtmlAll("<timestamp/><font color='#f69709'><b>[Mod]</font><i><span style='color: " + sys.getColor(src) + "'> " + sys.name(src) + "</b></i>: " + message.replace("&", "&amp;").replace("<", "&lt;"),  channel);
+        sys.stopEvent();
+    	this.afterChatMessage(src, message, channel);
+    } else if (sys.auth(src) == 0) {
+    	// #a6a6a6
+    	sys.sendHtmlAll("<timestamp/><font color='#a6a6a6'><b>[User]</font><span style='color: " + sys.getColor(src) + "'> " + sys.name(src) + "</b>: " + message.replace("&", "&amp;").replace("<", "&lt;"),  channel);
+        sys.stopEvent();
+    	this.afterChatMessage(src, message, channel);
+    } else if (!sys.dbRegistered(src)) {
+    	normalbot.sendAll(message, sachannel);
+    	sys.stopEvent();
+    	return;
+    }
 }, /* end of beforeChatMessage */
 
 
