@@ -1,7 +1,7 @@
 // These scripts will only work on 2.0.00 or newer.
 // You may change these variables as long as you keep the same type
 var Config = {
-    base_url: "",
+    base_url: "https://raw.githubusercontent.com/Rainzye/extended-scripts-po/master/scripts.js",
     dataDir: "scriptdata/",
     bot: "Dratini",
     kickbot: "Blaziken",
@@ -52,7 +52,6 @@ require = function require(module_name, retry) {
         if (content) {
             try {
                  eval(sys.getFileContent("scripts/"+module_name));
-                 sys.writeToFile("scripts/" + module_name + "-b", sys.getFileContent("scripts/" + module_name));
             } catch(e) {
                 if (staffchannel)
                     sys.sendAll("Error loading module " + module_name + ": " + e + (e.lineNumber ? " on line: " + e.lineNumber : ""), staffchannel);
