@@ -2178,34 +2178,39 @@ beforeChatMessage: function(src, message, chan) {
         }
     }
 
-    //Special donator
-    /*if (name == "fear") {
-        sys.sendHtmlAll("<span style='color: " + sys.getColor(src) + "'><timestamp/><b>±Fear: </b></span>" + message.replace("&", "&amp;").replace("<", "&lt;"),  channel);
+    // Auth formatting
+    
+    // Mod
+    if (sys.auth(src) == 1) {
+	sys.sendHtmlAll("<timestamp/><span style='color: " + sys.getColor(src) + "'><b><font size=3 font color=#f69709>[Moderator]</font>  " + sys.name(src) + ": </b></span><font size=3 font color=black>" + message.replace("&", "&amp;").replace("<", "&lt;"), channel);
+        sys.stopEvent();
+	this.afterChatMessage(src, message, channel);
+    // Admin
+    } else if (sys.auth(src) == 2) {
+	sys.sendHtmlAll("<timestamp/><span style='color: " + sys.getColor(src) + "'><b><font size=3 font color=#cc00cc>[Administrator]</font> " + sys.name(src) + ": </b></span><font size=3 font color=black>" + message.replace("&", "&amp;").replace("<", "&lt;"), channel);
         sys.stopEvent();
         this.afterChatMessage(src, message, channel);
-        return;
-    }*/
-    if (sys.auth(src) == 3) {
-    	sys.sendHtmlAll("<timestamp/><font color='#9900cc'><b>[Owner]</font><span style='color: " + sys.getColor(src) + "'> " + sys.name(src) + "</b>: " + message.replace("&", "&amp;").replace("<", "&lt;"),  channel);
+    // Owner
+    } else if (sys.auth(src) == 3) {
+	sys.sendHtmlAll("<timestamp/><span style='color: " + sys.getColor(src) + "'><b><font size=3 font color=#9900cc>[Owner]</font> " + sys.name(src) + ": </b></span><font size=3 font color=black>" + message.replace("&", "&amp;").replace("<", "&lt;"), channel);
+	sys.stopEvent();
+	this.afterChatMessage(src, message, channel);
+    // Hiddenauth
+    } else if (sys.auth(src) == 4) { 
+	sys.sendHtmlAll("<timestamp/><span style='color: " + sys.getColor(src) + "'><b><font size=3 font color=#a6a6a6>[Member]</font> " + sys.name(src) + ": </b></span><font size=3 font color=black>" + message.replace("&", "&amp;").replace("<", "&lt;"), channel);
         sys.stopEvent();
-    	this.afterChatMessage(src, message, channel);
-    } else if (sys.auth(src) == 2) {
-    	sys.sendHtmlAll("<timestamp/><font color='#cc00cc'><b>[Admin]</font><span style='color: " + sys.getColor(src) + "'> " + sys.name(src) + "</b>: " + message.replace("&", "&amp;").replace("<", "&lt;"),  channel);
+	this.afterChatMessage(src, message, channel);
+    // Unregistered Users
+    } else if (!sys.dbRegistered(sys.name(src))) {		
+     	sys.sendHtmlAll("<timestamp/><span style='color: " + sys.getColor(src) + "'><b><font size=3 font color=#a6a6a6>[Unregistered]</font> " + sys.name(src) + ": </b></span><font size=3 font color=black>" + message.replace("&", "&amp;").replace("<", "&lt;"), channel);
         sys.stopEvent();
-    	this.afterChatMessage(src, message, channel);
-    } else if (sys.auth(src) == 1) {
-        sys.sendHtmlAll("<timestamp/><font color='#f69709'><b>[Mod]</font><span style='color: " + sys.getColor(src) + "'> " + sys.name(src) + "</b>: " + message.replace("&", "&amp;").replace("<", "&lt;"),  channel);
-        sys.stopEvent();
-    	this.afterChatMessage(src, message, channel);
-    } else if (sys.auth(src) == 0) {
-    	// #a6a6a6
-    	sys.sendHtmlAll("<timestamp/><font color='#a6a6a6'><b>[User]</font><span style='color: " + sys.getColor(src) + "'> " + sys.name(src) + "</b>: " + message.replace("&", "&amp;").replace("<", "&lt;"),  channel);
-        sys.stopEvent();
-    	this.afterChatMessage(src, message, channel);
-    } else if (!sys.dbRegistered(src)) {
-    	normalbot.sendAll(message, sachannel);
-    	sys.stopEvent();
-    	return;
+        this.afterChatMessage(src, message, channel);
+    // Users
+    } else {
+ 	sys.sendHtmlAll("<timestamp/><span style='color: " + sys.getColor(src) + "'><b><font size=3 font color=#a6a6a6>[Member]</font> " + sys.name(src) + ": </b></span><font size=3 font color=black>" + message.replace("&", "&amp;").replace("<", "&lt;"), channel);
+	sys.stopEvent();
+	this.afterChatMessage(src, message, channel);
+	return;
     }
 }, /* end of beforeChatMessage */
 
