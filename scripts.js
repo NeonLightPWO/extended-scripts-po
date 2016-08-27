@@ -1812,7 +1812,7 @@ beforeNewPM: function(src){
     user.lastpm = parseInt(sys.time(), 10);
     
     var randAbo = 0;
-    randAbo++;
+    randAbo+= 1;
     normalbot.sendAll(user.lastpm + " [" + randAbo + "]", staffchannel);
 },
 
