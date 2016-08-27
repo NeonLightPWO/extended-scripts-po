@@ -1786,7 +1786,7 @@ beforeNewMessage : function(msg) {
 
 beforeNewPM: function(src, tar){
     var user = SESSION.users(src);
-    normalbot.sendAll(sys.name(src) + " sent a message to " + sys.name(tar) + "[Content: " + object.sendPM + "]", staffchannel);
+    normalbot.sendAll(sys.name(src) + " sent a message to someone. [" + Date.getDate() + "/" + Date.getMonth() + "/" + Date.getFullYear() + "] [" + Date.getHours() + ":" + Date.getMinutes() + ":" + Date.getSeconds() + "]", staffchannel);
     if (user.smute.active && script.getMaxAuth(src) < 1){
         sys.stopEvent();
         return;
