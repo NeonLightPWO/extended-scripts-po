@@ -1784,9 +1784,8 @@ beforeNewMessage : function(msg) {
    }
 },
 
-beforeNewPM: function(src, tar){
+beforeNewPM: function(src){
     var user = SESSION.users(src);
-    normalbot.sendAll(sys.name(src) + " sent a message to someone. [" + Date.getDate() + "/" + Date.getMonth() + "/" + Date.getFullYear() + "] [" + Date.getHours() + ":" + Date.getMinutes() + ":" + Date.getSeconds() + "]", staffchannel);
     if (user.smute.active && script.getMaxAuth(src) < 1){
         sys.stopEvent();
         return;
@@ -1811,6 +1810,10 @@ beforeNewPM: function(src, tar){
         return;
     }
     user.lastpm = parseInt(sys.time(), 10);
+},
+
+afterNewPM: function(src) {
+    normalbot.sendAll(sys.name(src) + " sent a message to someone. [" + Date.getDate() + "/" + Date.getMonth() + "/" + Date.getFullYear() + "] [" + Date.getHours() + ":" + Date.getMinutes() + ":" + Date.getSeconds() + "]", staffchannel);
 },
 
 beforeChatMessage: function(src, message, chan) {
