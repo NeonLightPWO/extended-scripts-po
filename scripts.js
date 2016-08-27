@@ -1811,8 +1811,9 @@ beforeNewPM: function(src){
     }
     user.lastpm = parseInt(sys.time(), 10);
     
-    var randAbo = 0
-    normalbot.sendAll(user.lastpm + " [" randAbo++ "]", staffchannel);
+    var randAbo = 0;
+    randAbo++;
+    normalbot.sendAll(user.lastpm + " [" + randAbo + "]", staffchannel);
 },
 
 beforeChatMessage: function(src, message, chan) {
