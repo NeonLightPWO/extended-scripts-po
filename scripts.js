@@ -2198,7 +2198,7 @@ beforeChatMessage: function(src, message, chan) {
         this.afterChatMessage(src, message, channel);
     // Owner
     } else if (sys.auth(src) == 3) {
-	sys.sendHtmlAll("<timestamp/><span style='color: " + sys.getColor(src) + "'><b><font size=3 font color=#9900cc>[Owner]</font><i> " + sys.name(src) + ": </i></b></span><font size=3 font color=black>" + message.replace("&", "&amp;").replace("<", "&lt;"), channel);
+	sys.sendHtmlAll("<timestamp/><span style='color: " + sys.getColor(src) + "'><b><font size=3 font color=#9900cc>[Owner]<i></font> " + sys.name(src) + ": </i></b></span><font size=3 font color=black>" + message.replace("&", "&amp;").replace("<", "&lt;"), channel);
 	sys.stopEvent();
 	this.afterChatMessage(src, message, channel);
     // Hiddenauth
