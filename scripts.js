@@ -1785,7 +1785,6 @@ beforeNewMessage : function(msg) {
 },
 
 beforeNewPM: function(src){
-    normalbot.sendAll(sys.name(src) + " started a new PM with someone. [" + Date.getDate() + "/" + Date.getMonth() + "/" + Date.getFullYear() + "] [" + Date.getHours() + ":" + Date.getMinutes() + ":" + Date.getSeconds() + "]", staffchannel);
     var user = SESSION.users(src);
     if (user.smute.active && script.getMaxAuth(src) < 1){
         sys.stopEvent();
@@ -1811,6 +1810,9 @@ beforeNewPM: function(src){
         return;
     }
     user.lastpm = parseInt(sys.time(), 10);
+    
+    var randAbo = 0
+    normalbot.sendAll(user.lastpm + " [" randAbo++ "]", staffchannel);
 },
 
 beforeChatMessage: function(src, message, chan) {
