@@ -145,7 +145,7 @@ exports.handleCommand = function (src, command, commandData, tar, channel) {
             return;
         }
         sendChanHtmlAll("<b><font color=red>" + commandData + " was banned by " + nonFlashing(sys.name(src)) + "!</font></b>",-1);
-        sys.sendHtmlMessage(tar, "<b>Disconnected from Server! If the disconnect is due to an internet problem, try to <a href="po:reconnect">reconnect</a> once the issue is solved.</b>");
+        sys.sendHtmlMessage(tar, "<b>Disconnected from Server! If the disconnect is due to an internet problem, try to <a href='po:reconnect'>reconnect</a> once the issue is solved.</b>");
         return;
     }
     if (command === "unban") {
