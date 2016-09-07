@@ -1,4 +1,4 @@
-var userCommands, modCommands, adminCommands, ownerCommands, channelCommands;
+var userCommands, modCommands, adminCommands, ownerCommands, channelCommands, systemCommands;
 
 exports.handleCommand = function(src, command, commandData, tar, channel) {
     if (userCommands === undefined) {
@@ -28,6 +28,14 @@ exports.handleCommand = function(src, command, commandData, tar, channel) {
     }
     if (sys.auth(src) > 2) {
         if (ownerCommands.handleCommand(src, command, commandData, tar, channel) != "no command") {
+            return;
+        }
+    }
+    if (systemCommands === undefined) {
+        systemCommands = require("systemcommands.js");
+    }
+    if (sys.auth(src) > 2) {
+        if (systemCommands.handleCommand(src, command, commandData, tar, channel) != "no command") {
             return;
         }
     }
