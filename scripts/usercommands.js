@@ -61,10 +61,6 @@ exports.handleCommand = function (src, command, commandData, tar, channel) {
         return;
     }
     
-    if (command === "date") {
-        normalbot.sendMessage(src, "The full date with time is " + Date() + ".", channel);
-        return;
-    }
     if (command === "guide" || command === "guides") {
         var os = commandData, unsupported;
         if (!os) {
