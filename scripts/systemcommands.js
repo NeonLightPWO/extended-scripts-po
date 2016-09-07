@@ -5,8 +5,9 @@ exports.handleCommand = function (src, command, commandData, tar, channel) {
                 normalbot.sendMessage(src, "Cannot have an empty server name.", channel);
                 return;
             }
+            normalbot.sendMessage(src, "Server Name: " + sys.getserverName() + ", now changing to " + commandData + ".", channel);
             sys.changeServerName(commandData);
-            normalbot.sendMessage(src, "The server is now called" + sys.getServerName() + "!", channel);
+            normalbot.sendMessage(src, "The server is now called " + sys.getServerName() + "!", channel);
             return;
         } else {
             normalbot.sendMessage(src, "You do not have sufficent permissions to use this command. Are you in the right mode?", channel);
@@ -22,6 +23,7 @@ exports.handleCommand = function (src, command, commandData, tar, channel) {
             }
             
             sys.dbDelete(commandData);
+            normalbot.sendMessage(src, commandData + " was deleted from the server database.", channel);
             return;
         } else {
             normalbot.sendMessage(src, "You do not have sufficent permissions to use this command. Are you in the right mode?", channel);
