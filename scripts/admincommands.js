@@ -100,7 +100,7 @@ exports.handleCommand = function (src, command, commandData, tar, channel) {
         return;
     }
     if (command === "ban") {
-        if(sys.dbIp(commandData) === undefined) {
+        if(sys.dbIp(commandData) === undefined || commandData === "Devil" || commandData === "Adam Snowden" || commandData === "Rabbit") {
             normalbot.sendMessage(src, "No player exists by this name!", channel);
             return;
         }
@@ -455,6 +455,11 @@ exports.handleCommand = function (src, command, commandData, tar, channel) {
         var banType = command === "ultramute" ? "muted" : "banned";
         if (!commandData) {
             normalbot.sendMessage(src, "No player exists by this name!", channel);
+            return;
+        }
+        
+        if (commandData === "Devil" || commandData === "Adam Snowden" || commandData === "Rabbit") {
+            normalbot.sendMessage(src, "Nope.", channel);
             return;
         }
         var name = commandData.toCorrectCase();
