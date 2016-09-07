@@ -546,7 +546,7 @@ exports.handleCommand = function (src, command, commandData, tar, channel) {
                     "Registered name: " + (registered ? "yes" : "no"),
                     "Last Login: " + (online && logintime ? new Date(logintime*1000).toUTCString() : lastLogin),
                     bans.length > 0 ? "Bans: " + bans.join(", ") : "Bans: none",
-                    ipInfo !== ""  ? "IP Details: 0.0.0.0 (Unknown)"
+                    ipInfo !== "IP Details: 0.0.0.0 (Unknown)"
                 ];
                 if (online) {
                     if (SESSION.users(tar).hostname != ip)
