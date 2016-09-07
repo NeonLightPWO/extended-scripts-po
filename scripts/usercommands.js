@@ -61,8 +61,8 @@ exports.handleCommand = function (src, command, commandData, tar, channel) {
         return;
     }
     
-    if (command === "time") {
-        normalbot.sendMessage(src, "The time is " + Date().toLocaleTimeString().replace("/.*(\d{2}:\d{2}:\d{2}).*/", "$1"), channel);
+    if (command === "date") {
+        normalbot.sendMessage(src, "The full date with time is " + Date() + ".", channel);
         return;
     }
     if (command === "guide" || command === "guides") {
