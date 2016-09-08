@@ -9,7 +9,7 @@ exports.handleCommand = function (src, command, commandData, tar, channel) {
             sys.putInChannel(tar, commandData);
             normalbot.sendMessage(tar, sys.name(src) + " has redirected you to this channel.", channel);
         } else {
-            normalbot.sendMessage(src, "The user " + sys.name(tar) + " already seems to be in channel " + channel + ".", channel);
+            normalbot.sendMessage(src, "The user " + sys.name(tar) + " already seems to be in this channel.", channel);
         }
         
         return;
