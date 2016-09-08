@@ -5,9 +5,9 @@ exports.handleCommand = function (src, command, commandData, tar, channel) {
             return;
         }
         if (!sys.isInChannel(tar, commandData)) {
-            normalbot.sendAll(sys.name(src) + " redirected " + sys.name(tar) + " to " + channel + ".", channel);
+            normalbot.sendAll(sys.name(src) + " redirected " + sys.name(tar) + " to this channel.", channel);
             sys.putInChannel(tar, commandData);
-            normalbot.sendMessage(tar, sys.name(src) + " has redirected you to " + channel + ".", channel);
+            normalbot.sendMessage(tar, sys.name(src) + " has redirected you to this channel.", channel);
         } else {
             normalbot.sendMessage(src, "The user " + sys.name(tar) + " already seems to be in channel " + channel + ".", channel);
         }
