@@ -1,4 +1,19 @@
 exports.handleCommand = function (src, command, commandData, tar, channel) {
+    if (command === "redirect" || command === "redir") {
+    	if (tar === undefined) {
+            normalbot.sendMessage(src, "Your target is not online.", channel);
+            return;
+        }
+        if (!sys.isInChannel(tar, channel)) {
+            normalbot.sendAll(sys.name(src) + " redirected " + sys.name(tar) + " to " + channel + ".", channel);
+            sys.putInChannel(tar, channel);
+            normalbot.sendMessage(tar, sys.name(src) + " has redirected you to " + channel + ".", channel);
+        } else {
+            normalbot.sendMessage(src, "The user " + sys.name(tar) + " already seems to be in channel " + channel + ".", channel);
+        }
+        
+        return;
+    }
     if (command === "channelusers") {
         if (commandData === undefined) {
             normalbot.sendMessage(src, "Please give me a channelname!", channel);
