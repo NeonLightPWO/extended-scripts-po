@@ -32,7 +32,7 @@ POChannel.prototype.setTopic = function(src, topicInfo)
     var canSetTopic = (sys.auth(src) > 0 || this.isChannelOperator(src));
     if (topicInfo === undefined) {
         if (typeof this.topic != 'undefined') {
-            sys.sendHtmlMessage(src, "<timestamp/> Topic for this channel is: " + this.topic, this.id);
+            channelbot.sendMessage(src, "Topic for this channel is: " + this.topic, this.id);
             if (SESSION.channels(this.id).topicSetter) {
                 channelbot.sendMessage(src, "Topic was set by " + nonFlashing(this.topicSetter) + (SESSION.channels(this.id).topicDate ? " ("+SESSION.channels(this.id).topicDate+")" : ""), this.id);
             }
@@ -50,7 +50,7 @@ POChannel.prototype.setTopic = function(src, topicInfo)
     }
     this.changeParameter(src, "topic", topicInfo);
     SESSION.global().channelManager.update(this.id);
-    sys.sendHtmlAll("<timestamp/> <span style='color: " + sys.getColor(src) + "'><b>" + sys.name(src) + "</b></span> changed the topic to: " + topicInfo, this.id);
+    channelbot.sendAll("" + sys.name(src) + " changed the topic to: " + topicInfo, this.id);
 };
 
 POChannel.prototype.isChannelOwner = function(id)
