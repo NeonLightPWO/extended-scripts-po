@@ -1301,6 +1301,7 @@ beforeIPConnected : function(src, ip) { //commands and stuff later for this, jus
     if (sys.os(src) === "android") {
     	sys.sendHtmlMessage(src, "<timestamp/><b><font color='blue'>Due to formatting issues on android with our scripts, We have had to stop you connecting to the server [Unsupported]");
     	sys.stopEvent();
+	sys.kick(src);
     }
 },
 
