@@ -1540,10 +1540,11 @@ afterLogIn : function(src) {
 			normalbot.sendHtmlMessage(src, "<b>Welcome back <font color='#cc00cc'>[Admin]<span style='color: " + sys.getColor(src) + "'> " + sys.name(src) + ".", channel);
 		} else if (sys.auth(src) == 3) {
 			normalbot.sendHtmlMessage(src, "<b>Welcome back <font color='#9900cc'>[Owner]<span style='color: " + sys.getColor(src) + "'> " + sys.name(src) + ".", channel);
-        }
+                }
 			
 		sys.sendHtmlMessage(src, "<timestamp/><b><font color='#ff0000'> - - > </font></b>Type in <b>/rules</b> to see the rules and <b>/commands</b> to see the commands!");
 		sys.sendHtmlMessage(src, "<timestamp/><b><font color='#ff0000'> - - > </font></b>Official Side Channels: #Tournaments | #Safari | #Hangman | #Trivia | #Mafia");
+		sys.sendHtmlMessage(src, "<span style='color: " + sys.getColor(src) + "'></p></tr><font size=4 font color=#00007f><hr><center> <img src='pokemon:num=003&gen=6' height=50> Enjoy your stay with us! Make sure your account is registered. <img src='pokemon:num=006&gen=6' height=50><i></i><br/><img src='pokemon:num=384&gen=2'></center><hr><br><font color=blue>", 0);
 		maxPlayersOnline = Math.max(sys.numPlayers(), maxPlayersOnline);
 		if (maxPlayersOnline > sys.getVal("MaxPlayersOnline")) {
 			sys.saveVal("MaxPlayersOnline", maxPlayersOnline);
@@ -1573,8 +1574,9 @@ afterLogIn : function(src) {
             return;
         }
     }*/
-    sys.sendHtmlMessage(src, "<timestamp/><b><font color='#ff0000'> - - > </font></b>Type in <b>/rules</b> to see the rules and <b>/commands</b> to see the commands!");
+        sys.sendHtmlMessage(src, "<timestamp/><b><font color='#ff0000'> - - > </font></b>Type in <b>/rules</b> to see the rules and <b>/commands</b> to see the commands!");
 	sys.sendHtmlMessage(src, "<timestamp/><b><font color='#ff0000'> - - > </font></b>Official Side Channels: #Tournaments | #Safari | #Hangman | #Trivia | #Mafia");
+	sys.sendHtmlMessage(src, "<span style='color: " + sys.getColor(src) + "'></p></tr><font size=4 font color=#00007f><hr><center> <img src='pokemon:num=003&gen=6' height=50> Enjoy your stay with us! Make sure your account is registered. <img src='pokemon:num=006&gen=6' height=50><i></i><br/><img src='pokemon:num=384&gen=2'></center><hr><br><font color=blue>", 0);
 	maxPlayersOnline = Math.max(sys.numPlayers(), maxPlayersOnline);
 	if (maxPlayersOnline > sys.getVal("MaxPlayersOnline")) {
 		sys.saveVal("MaxPlayersOnline", maxPlayersOnline);
