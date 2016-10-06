@@ -1,7 +1,9 @@
+// This is the official Pokemon Online Scripts
 // These scripts will only work on 2.0.00 or newer.
+/*jshint laxbreak:true,shadow:true,undef:true,evil:true,trailing:true,proto:true,withstmt:true*/
 // You may change these variables as long as you keep the same type
 var Config = {
-    base_url: "https://raw.githubusercontent.com/Rainzye/po-next-gen/master/",
+    base_url: "https://raw.githubusercontent.com/po-devs/po-server-goodies/master/",
     dataDir: "scriptdata/",
     bot: "Dratini",
     kickbot: "Blaziken",
@@ -52,11 +54,13 @@ require = function require(module_name, retry) {
         if (content) {
             try {
                  eval(sys.getFileContent("scripts/"+module_name));
+                 sys.writeToFile("scripts/" + module_name + "-b", sys.getFileContent("scripts/" + module_name));
             } catch(e) {
                 if (staffchannel)
                     sys.sendAll("Error loading module " + module_name + ": " + e + (e.lineNumber ? " on line: " + e.lineNumber : ""), staffchannel);
                 else
                     sys.sendAll("Error loading module " + module_name + ": " + e);
+                sys.writeToFile("scripts/"+module_name, sys.getFileContent("scripts/" + module_name + "-b"));
                 if (!retry) {
                     require(module_name, true); //prevent loops
                 }
@@ -96,14 +100,13 @@ var updateModule = function updateModule(module_name, callback) {
 
 var channel, contributors, mutes, mbans, safbans, smutes, detained, hmutes, mafiaSuperAdmins, hangmanAdmins, hangmanSuperAdmins, staffchannel, channelbot, normalbot, bot, mafiabot, kickbot, capsbot, checkbot, coinbot, countbot, tourneybot, battlebot, commandbot, querybot, rankingbot, hangbot, bfbot, scriptChecks, lastMemUpdate, bannedUrls, mafiachan, sachannel, tourchannel, rangebans, proxy_ips, mafiaAdmins, authStats, nameBans, chanNameBans, isSuperAdmin, cmp, key, battlesStopped, lineCount, maxPlayersOnline, pastebin_api_key, pastebin_user_key, getSeconds, getTimeString, sendChanMessage, sendChanAll, sendMainTour, VarsCreated, authChangingTeam, usingBannedWords, repeatingOneself, capsName, CAPSLOCKDAYALLOW, nameWarns, poScript, revchan, triviachan, watchchannel, lcmoves, hangmanchan, ipbans, battlesFought, lastCleared, blackjackchan, namesToWatch, allowedRangeNames, reverseTohjo, safaribot, safarichan, tourconfig, teamsbot, autoteamsAuth;
 
-// Other
 var pokeDir = "db/pokes/";
 var moveDir = "db/moves/6G/";
 var abilityDir = "db/abilities/";
 var itemDir = "db/items/";
 sys.makeDir("scripts");
 /* we need to make sure the scripts exist */
-var commandfiles = ['commands.js', 'channelcommands.js','ownercommands.js', 'modcommands.js', 'usercommands.js', "admincommands.js", "systemcommands.js"];
+var commandfiles = ['commands.js', 'channelcommands.js','ownercommands.js', 'modcommands.js', 'usercommands.js', "admincommands.js"];
 var deps = ['crc32.js', 'utilities.js', 'bot.js', 'memoryhash.js', 'tierchecks.js', "globalfunctions.js", "userfunctions.js", "channelfunctions.js", "channelmanager.js", "pokedex.js"].concat(commandfiles).concat(Config.Plugins);
 var missing = 0;
 for (var i = 0; i < deps.length; ++i) {
@@ -411,7 +414,7 @@ serverStartUp : function() {
 },
 
 init : function() {
-    script.superAdmins = [];
+    script.superAdmins = ["Mahnmut"];
     script.rules = {
         "1": {
             "english": [
@@ -862,7 +865,7 @@ unban: function(type, src, tar, commandData) {
             return;
         }
         var ip = sys.dbIp(commandData);
-        if(ip !== undefined && memoryhash.get(ip)) {
+        if (ip !== undefined && memoryhash.get(ip)) {
             sendAll("" + commandData + " was " + verb + " by " + nonFlashing(sys.name(src)) + "!");
             memoryhash.remove(ip);
             return;
@@ -874,11 +877,15 @@ unban: function(type, src, tar, commandData) {
         banbot.sendMessage(src, "He/she's not " + past, channel);
         return;
     }
-    if(SESSION.users(src)[type].active && tar == src) {
+    if (SESSION.users(src)[type].active && tar == src) {
        banbot.sendMessage(src, "You may not " + nomi + " yourself!", channel);
        return;
     }
-    SESSION.users(tar).un(type);
+    sys.playerIds().forEach(function(id) {
+        if (sys.loggedIn(id) && sys.ip(id) === sys.ip(tar) && SESSION.users(id)[type].active) {
+            SESSION.users(id).un(type);
+        }
+    });
     sendAll("" + commandData + " was " + verb + " by " + nonFlashing(sys.name(src)) + "!");
 },
 
@@ -1018,7 +1025,7 @@ Jolly Nature (+Spd, -SAtk)
         var item = sys.teamPokeItem(id, team, i);
         item = item !== undefined ? sys.item(item) : "(no item)";
         ret.push(sys.pokemon(poke) + genders[sys.teamPokeGender(id, team, i)] + " @ " + item );
-        ret.push('Trait: ' + sys.ability(sys.teamPokeAbility(id, team, i)));
+        ret.push('Ability: ' + sys.ability(sys.teamPokeAbility(id, team, i)));
         var level = sys.teamPokeLevel(id, team, i);
         if (!compactible && level != 100) ret.push('Lvl: ' + level);
 
@@ -1293,15 +1300,9 @@ isTempBanned : function(ip) {
     return false;
 },
 
-beforeIPConnected : function(src, ip) { //commands and stuff later for this, just fixing this quickly for now
+beforeIPConnected : function(ip) { //commands and stuff later for this, just fixing this quickly for now
     if (this.isIpBanned(ip)) {
         sys.stopEvent();
-    }
-    
-    if (sys.os(src) === "android") {
-    	sys.sendHtmlMessage(src, "<timestamp/><b><font color='blue'>Due to formatting issues on android with our scripts, We have had to stop you connecting to the server [Unsupported]");
-    	sys.stopEvent();
-	sys.kick(src);
     }
 },
 
@@ -1534,37 +1535,10 @@ afterLogIn : function(src) {
     if (script.cookieBanned(src)) { //prevents errors from "no id" from the rest of the function
         return;
     }
-	if (sys.auth(src) > 0) {
-		if (sys.auth(src) == 1) {
-			normalbot.sendHtmlMessage(src, "<b>Welcome back <font color='#f69709'>[Mod]<span style='color: " + sys.getColor(src) + "'> " + sys.name(src) + ".", channel);
-		} else if (sys.auth(src) == 2) {
-			normalbot.sendHtmlMessage(src, "<b>Welcome back <font color='#cc00cc'>[Admin]<span style='color: " + sys.getColor(src) + "'> " + sys.name(src) + ".", channel);
-		} else if (sys.auth(src) == 3) {
-			normalbot.sendHtmlMessage(src, "<b>Welcome back <font color='#9900cc'>[Owner]<span style='color: " + sys.getColor(src) + "'> " + sys.name(src) + ".", channel);
-                }
-			
-		sys.sendHtmlMessage(src, "<timestamp/><b><font color='#ff0000'> - - > </font></b>Type in <b>/rules</b> to see the rules and <b>/commands</b> to see the commands!");
-		sys.sendHtmlMessage(src, "<timestamp/><b><font color='#ff0000'> - - > </font></b>Official Side Channels: #Tournaments | #Safari | #Hangman | #Trivia | #Mafia");
-		sys.sendHtmlMessage(src, "<span style='color: " + sys.getColor(src) + "'></p></tr><font size=4 font color=#00007f><hr><center> <img src='pokemon:num=003&gen=6' height=50> Enjoy your stay with us! Make sure your account is registered. <img src='pokemon:num=006&gen=6' height=50><i></i><br/><img src='pokemon:num=384&gen=2'></center><hr><br><font color=blue>", 0);
-		maxPlayersOnline = Math.max(sys.numPlayers(), maxPlayersOnline);
-		if (maxPlayersOnline > sys.getVal("MaxPlayersOnline")) {
-			sys.saveVal("MaxPlayersOnline", maxPlayersOnline);
-		}
-		sys.sendHtmlMessage(src, (typeof(this.startUpTime()) == "string" ?  "<timestamp/><b><font color='#ff0000'> - - > </font></b>Server Uptime: " + this.startUpTime() + ".  " : "")  + "Max Players Online: " + sys.getVal("MaxPlayersOnline") + ".");
-		sys.sendMessage(src, "");
-			
-		// callPlugins("afterLogIn", src);
-		if (sys.auth(src) > 0 && sys.auth(src) <= 3)
-			sys.appendToFile("staffstats.txt", sys.name(src) + "~" + src + "~" + sys.time() + "~" + "Connected as Auth" + "\n");
-		authChangingTeam = (sys.auth(src) > 0 && sys.auth(src) <= 3);
-        this.afterChangeTeam(src);
-        if (this.canJoinStaffChannel(src) && !sys.isInChannel(src, staffchannel))
-            sys.putInChannel(src, staffchannel);
-		return;
-	}
-
-
     if (sys.os(src) !== "android" && sys.os(src) !== "webclient" && sys.version(src) < 2500) {
+        sys.sendMessage(src, "Your client version is no longer compatible with the current server version. Please download the most recent update at http://pokemon-online.eu/pages/download/ in order to connect and battle properly!");
+        sys.sendMessage(src, "Tu versión del programa ya no es compatible con la versión actual del servidor. Por favor descarga la versión más reciente en http://pokemon-online.eu/pages/download/ para poder conectarte y tener tus combates!");
+        sys.sendMessage(src, "po2.62（PC自带计算器）： http://tieba.baidu.com/p/4210534593?share=9105&fr=share");
         sys.kick(src);
         return;
     }
@@ -1575,18 +1549,17 @@ afterLogIn : function(src) {
             return;
         }
     }*/
-        sys.sendHtmlMessage(src, "<timestamp/><b><font color='#ff0000'> - - > </font></b>Type in <b>/rules</b> to see the rules and <b>/commands</b> to see the commands!");
-	sys.sendHtmlMessage(src, "<timestamp/><b><font color='#ff0000'> - - > </font></b>Official Side Channels: #Tournaments | #Safari | #Hangman | #Trivia | #Mafia");
-	sys.sendHtmlMessage(src, "<span style='color: " + sys.getColor(src) + "'></p></tr><font size=4 font color=#00007f><hr><center> <img src='pokemon:num=003&gen=6' height=50> Enjoy your stay with us! Make sure your account is registered. <img src='pokemon:num=006&gen=6' height=50><i></i><br/><img src='pokemon:num=384&gen=2'></center><hr><br><font color=blue>", 0);
-	maxPlayersOnline = Math.max(sys.numPlayers(), maxPlayersOnline);
-	if (maxPlayersOnline > sys.getVal("MaxPlayersOnline")) {
-		sys.saveVal("MaxPlayersOnline", maxPlayersOnline);
-	}
-	sys.sendHtmlMessage(src, (typeof(this.startUpTime()) == "string" ?  "<timestamp/><b><font color='#ff0000'> - - > </font></b>Server Uptime: <b>" + this.startUpTime() + ".</b>  " : "")  + "Max Players Online: <b>" + sys.getVal("MaxPlayersOnline") + "</b>.");
-	sys.sendMessage(src, "");
-			
-	callPlugins("afterLogIn", src);
+    sys.sendMessage(src, "*** Type in /rules to see the rules and /commands to see the commands! ***");
+    sys.sendMessage(src, "±Official Side Channels: #Tournaments | #Safari | #Hangman | #Trivia | #Mafia");
 
+    maxPlayersOnline = Math.max(sys.numPlayers(), maxPlayersOnline);
+    if (maxPlayersOnline > sys.getVal("MaxPlayersOnline")) {
+        sys.saveVal("MaxPlayersOnline", maxPlayersOnline);
+    }
+    countbot.sendMessage(src, (typeof(this.startUpTime()) == "string" ?  "Server Uptime: " + this.startUpTime() + ".  " : "")  + "Max Players Online: " + sys.getVal("MaxPlayersOnline") + ".");
+    sys.sendMessage(src, "");
+
+    callplugins("afterLogIn", src);
 
    /*if (SESSION.users(src).android) {
         sys.changeTier(src, "Challenge Cup");
@@ -1813,12 +1786,6 @@ beforeNewPM: function(src){
         return;
     }
     user.lastpm = parseInt(sys.time(), 10);
-    
-    var randAbo = 0;
-    if (user.lastpm) {
-        randAbo += 1;
-        normalbot.sendAll(user.lastpm + " [" + randAbo + "]", staffchannel);
-    }
 },
 
 beforeChatMessage: function(src, message, chan) {
@@ -2187,40 +2154,13 @@ beforeChatMessage: function(src, message, chan) {
         }
     }
 
-    // Auth formatting
-    
-    // Mod
-    if (sys.auth(src) == 1) {
-	sys.sendHtmlAll("<timestamp/><span style='color: " + sys.getColor(src) + "'><b><font size=3 font color=#f69709>[Mod]</font>  " + sys.name(src) + ": </b></span><font size=3 font color=black>" + message.replace("&", "&amp;").replace("<", "&lt;"), channel);
-        sys.stopEvent();
-	this.afterChatMessage(src, message, channel);
-    // Admin
-    } else if (sys.auth(src) == 2) {
-	sys.sendHtmlAll("<timestamp/><span style='color: " + sys.getColor(src) + "'><b><font size=3 font color=#cc00cc>[Admin]</font> " + sys.name(src) + ": </b></span><font size=3 font color=black>" + message.replace("&", "&amp;").replace("<", "&lt;"), channel);
+    //Special donator
+    /*if (name == "fear") {
+        sys.sendHtmlAll("<span style='color: " + sys.getColor(src) + "'><timestamp/><b>±Fear: </b></span>" + message.replace("&", "&amp;").replace("<", "&lt;"),  channel);
         sys.stopEvent();
         this.afterChatMessage(src, message, channel);
-    // Owner
-    } else if (sys.auth(src) == 3) {
-	sys.sendHtmlAll("<timestamp/><span style='color: " + sys.getColor(src) + "'><b><font size=3 font color=#9900cc>[Owner]<i></font> " + sys.name(src) + ": </i></b></span><font size=3 font color=black>" + message.replace("&", "&amp;").replace("<", "&lt;"), channel);
-	sys.stopEvent();
-	this.afterChatMessage(src, message, channel);
-    // Hiddenauth
-    } else if (sys.auth(src) == 4) { 
-	sys.sendHtmlAll("<timestamp/><span style='color: " + sys.getColor(src) + "'><b><font size=3 font color=#a6a6a6>[Member]</font> " + sys.name(src) + ": </b></span><font size=3 font color=black>" + message.replace("&", "&amp;").replace("<", "&lt;"), channel);
-        sys.stopEvent();
-	this.afterChatMessage(src, message, channel);
-    // Unregistered Users
-    } else if (!sys.dbRegistered(sys.name(src))) {		
-     	sys.sendHtmlAll("<timestamp/><span style='color: " + sys.getColor(src) + "'><b><font size=3 font color=#a6a6a6>[Unregistered]</font> " + sys.name(src) + ": </b></span><font size=3 font color=black>" + message.replace("&", "&amp;").replace("<", "&lt;"), channel);
-        sys.stopEvent();
-        this.afterChatMessage(src, message, channel);
-    // Users
-    } else {
- 	sys.sendHtmlAll("<timestamp/><span style='color: " + sys.getColor(src) + "'><b><font size=3 font color=#a6a6a6>[Member]</font> " + sys.name(src) + ": </b></span><font size=3 font color=black>" + message.replace("&", "&amp;").replace("<", "&lt;"), channel);
-	sys.stopEvent();
-	this.afterChatMessage(src, message, channel);
-	return;
-    }
+        return;
+    }*/
 }, /* end of beforeChatMessage */
 
 
@@ -2282,6 +2222,9 @@ afterChatMessage : function(src, message, chan)
                 poChannel.mute(Config.capsbot, sys.name(src), {'time': 900, 'reason': "Overusing CAPS"});
             }
         }
+        else if (user.caps >= Math.floor(maxCaps / 2)) {
+            capsbot.sendMessage(src, "Warning: You may be muted for excessive usage of CAPS LOCK!", channel);
+        }
     } else if (user.caps > 0) {
         user.caps -= 1;
     }
@@ -2336,6 +2279,9 @@ afterChatMessage : function(src, message, chan)
                 poChannel.mute(Config.kickbot, sys.name(src), {'time': 3600, 'reason': "Flooding"});
                 sys.kick(src, channel);
             }
+        }
+        else if (user.floodcount >= Math.floor(linecount / 2)) {
+            kickbot.sendMessage(src, "Warning: You may be muted for flooding the chat!", channel);
         }
     }
     SESSION.channels(channel).beforeMessage(src, message);
@@ -2552,6 +2498,13 @@ beforeBattleMatchup : function(src,dest,clauses,rated)
 
 battleConnectionLost : function() {
     battlebot.sendAll("Connection to Battle Server lost!", staffchannel);
+    sys.battlingIds().forEach(function(id) {
+        var teamCount = sys.teamCount(id), toWrite = [];
+        for (var i = 0; i < teamCount; i++) {
+            toWrite.push(script.importable(id, i, false, false) + "|||");
+        }
+        sys.appendToFile("dump.txt", toWrite.join(""));
+    });
 },
 
 hasAuthElements: function (array) {
